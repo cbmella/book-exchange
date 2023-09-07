@@ -1,0 +1,12 @@
+# Archivos y directorios generales
+.DS_Store
+.env
+node_modules/
+vendor/
+
+# Docker
+*.log
+docker-compose.override.yml
+
+# Base de datos
+mysql_data/
