@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController; // Añade esta línea
 
 /*
 |--------------------------------------------------------------------------
@@ -18,10 +19,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('login', 'AuthController@login');
-Route::post('register', 'AuthController@register');
-Route::post('logout', 'AuthController@logout')->middleware('auth:api');
+// Modifica las rutas para que utilicen la nueva sintaxis
+Route::post('login', [AuthController::class, 'login']);
+Route::post('register', [AuthController::class, 'register']);
+Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:api');
 
 Route::group(['middleware' => ['auth:api']], function () {
-    // Tus rutas protegidas aquí
+    Route::get('/protected-route', function () {
+        return response()->json(['message' => 'This is a protected route']);
+    });
+    // Otras rutas protegidas aquí
 });
