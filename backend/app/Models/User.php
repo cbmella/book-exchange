@@ -54,4 +54,20 @@ class User extends Authenticatable
     {
         return [];
     }
+
+    public function books() {
+        return $this->hasMany(Book::class);
+    }
+
+    public function exchangesAsBorrower() {
+        return $this->hasMany(Exchange::class, 'borrower_id');
+    }
+
+    public function exchangesAsLender() {
+        return $this->hasMany(Exchange::class, 'lender_id');
+    }
+
+    public function reviews() {
+        return $this->hasMany(Review::class);
+    }
 }
