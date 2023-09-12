@@ -13,7 +13,15 @@ return new class extends Migration
     {
         Schema::create('exchanges', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('borrower_id');
+            $table->unsignedBigInteger('lender_id');
+            $table->unsignedBigInteger('book_id');
+            $table->date('exchange_date');
             $table->timestamps();
+            
+            $table->foreign('borrower_id')->references('id')->on('users');
+            $table->foreign('lender_id')->references('id')->on('users');
+            $table->foreign('book_id')->references('id')->on('books');
         });
     }
 
