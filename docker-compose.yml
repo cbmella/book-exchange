@@ -19,9 +19,9 @@ services:
   frontend:
     build:
       context: ./frontend
-    container_name: vue_frontend
+    container_name: next_frontend
     ports:
-      - "8080:8080"
+      - "8080:3000"
     volumes:
       - ./frontend:/app
 
