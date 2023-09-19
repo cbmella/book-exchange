@@ -1,24 +1,22 @@
-# frontend-book-exchange
+# Frontend del Sistema de Intercambio de Libros
 
-## Project setup
-```
-yarn install
-```
+Interfaz desarrollada con [Tecnología/Framework] para interactuar con el backend.
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
+## Requisitos
 
-### Compiles and minifies for production
-```
-yarn build
-```
+- Node.js versión [X.X]
+- [Otras dependencias]
 
-### Lints and fixes files
-```
-yarn lint
-```
+## Instalación
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+1. Instalar dependencias con npm: `npm install`
+2. Copiar `.env.example` a `.env` y configurar variables de entorno.
+3. Ejecutar el servidor de desarrollo: `npm run serve` (o comando correspondiente)
+4. [Otros pasos]
+
+## Características
+
+- Registro y autenticación de usuarios.
+- Búsqueda y visualización de libros disponibles.
+- Interfaz para dejar opiniones sobre libros.
+

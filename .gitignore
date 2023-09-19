@@ -10,3 +10,7 @@ docker-compose.override.yml
 
 # Base de datos
 mysql_data/
+
+# tutorial
+
+tutorial
