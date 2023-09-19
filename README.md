@@ -28,9 +28,9 @@ El proyecto se compone de dos subproyectos principales:
 
 Para más detalles, referirse a los `README.md` específicos de cada subproyecto.
 
-### [Link a README del Backend]
+### [backend/README.md]
 
-### [Link a README del Frontend]
+### [frontend/README.md]
 
 ## Requisitos
 
@@ -39,8 +39,8 @@ Para más detalles, referirse a los `README.md` específicos de cada subproyecto
 
 ## Instalación y Uso
 
-1. Clonar el repositorio: `git clone [url-del-repositorio]`
-2. Navegar al directorio: `cd nombre-del-proyecto`
+1. Clonar el repositorio: `git clone [https://github.com/cbmella/book-exchange]`
+2. Navegar al directorio: `cd book-exchange`
 3. Ejecutar `docker-compose up -d`
 4. [Otros pasos necesarios]
 
@@ -51,4 +51,3 @@ Instrucciones para colaboradores o para quienes deseen hacer PRs.
 ## Licencia
 
 [Nombre de la licencia, por ejemplo, MIT]
-
