@@ -6,17 +6,19 @@ use App\Models\Book;
 use App\Models\Exchange;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class ExchangeManagementTest extends TestCase
+class ExchangeControllerTest extends TestCase
 {
     use RefreshDatabase;
-    
+
     /**
-     * A user must be able to request a trade
+     *  Test that a user can leave a review after an exchange.
+     *
+     * @test
+     * @return void
      */
-    public function test_user_can_request_exchange()
+    public function a_user_can_request_an_exchange()
     {
         $borrower = User::factory()->create();
         $lender = User::factory()->create();
@@ -28,9 +30,12 @@ class ExchangeManagementTest extends TestCase
     }
 
     /**
-     * The owner of the book must be able to accept or reject a trade
+     *  Test that a user cannot request an exchange for a book they own.
+     *
+     * @test
+     * @return void
      */
-    public function test_lender_can_accept_exchange_request()
+    public function a_lender_can_accept_an_exchange_request()
     {
         $borrower = User::factory()->create();
         $lender = User::factory()->create();
