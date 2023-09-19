@@ -16,7 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger('borrower_id');
             $table->unsignedBigInteger('lender_id');
             $table->unsignedBigInteger('book_id');
-            $table->date('exchange_date');
+            $table->date('exchange_date')->default(now());
+            $table->string('status')->default('pending');
             $table->timestamps();
             
             $table->foreign('borrower_id')->references('id')->on('users');
