@@ -4,7 +4,6 @@ namespace Tests\Unit;
 
 use App\Models\Book;
 use App\Models\Exchange;
-use App\Models\Review;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -12,53 +11,77 @@ use Tests\TestCase;
 
 class BookTest extends TestCase
 {
-    use RefreshDatabase;
-    
+    use RefreshDatabase, WithFaker;
+
+    protected $user;
+    protected $book;
+    protected $exchange;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->user = User::factory()->create();
+        $this->book = Book::factory()->create(['user_id' => $this->user->id]);
+        $this->exchange = Exchange::factory()->create(['book_id' => $this->book->id]);
+    }
+
     /**
      * Test if a book belongs to its owner.
      *
+     * @test
      * @return void
      */
-    public function test_book_belongs_to_owner()
+    public function a_book_belongs_to_its_owner()
     {
-        $user = User::factory()->create();
-        $book = Book::factory()->create(['user_id' => $user->id]);
-        $this->assertEquals($user->id, $book->user->id);
+        $this->assertEquals($this->user->id, $this->book->user->id);
     }
 
     /**
-     * Test if a book has exchanges.
+     * Test if a book has multiple exchanges.
      *
+     * @test
      * @return void
      */
-    public function test_book_has_exchanges()
+    public function a_book_has_multiple_exchanges()
     {
-        $book = Book::factory()->create();
-        $exchange = Exchange::factory()->create(['book_id' => $book->id]);
-        $this->assertTrue($book->exchanges->contains($exchange));
+        $exchange2 = Exchange::factory()->create(['book_id' => $this->book->id]);
+
+        $this->assertTrue($this->book->exchanges->contains($this->exchange));
+        $this->assertTrue($this->book->exchanges->contains($exchange2));
     }
 
     /**
-     * Test if a book can be searched by title.
+     * Test if a book can be accurately searched by title.
      *
+     * @test
      * @return void
      */
-    public function test_book_can_be_searched_by_title()
+    public function a_book_can_be_accurately_searched_by_title()
     {
-        $book = Book::factory()->create(['title' => 'Test Book']);
-        $searchedBook = Book::search('Test Book')->first();
-        $this->assertEquals($book->id, $searchedBook->id);
+        $title = $this->faker->sentence;
+        $book1 = Book::factory()->create(['title' => $title]);
+        $book2 = Book::factory()->create(['title' => $this->faker->sentence]);
+        $searchedBook = Book::search($title)->first();
+
+        $this->assertEquals($book1->id, $searchedBook->id);
+        $this->assertNotEquals($book2->id, $searchedBook->id);
     }
 
     /**
-     * Test if a book can be searched by author.
+     * Test if a book can be accurately searched by author.
      *
+     * @test
      * @return void
      */
-    public function test_book_can_be_searched_by_author()
+    public function a_book_can_be_accurately_searched_by_author()
     {
-        $book = Book::factory()->create(['author' => 'Test Author']);
-        $searchedBook = Book::search('Test Author')->first();
-        $this->assertEquals($book->id, $searchedBook->id);
+        $author = $this->faker->name;
+        $book1 = Book::factory()->create(['author' => $author]);
+        $book2 = Book::factory()->create(['author' => $this->faker->name]);
+        $searchedBook = Book::search($author)->first();
+
+        $this->assertEquals($book1->id, $searchedBook->id);
+        $this->assertNotEquals($book2->id, $searchedBook->id);
     }
 }
