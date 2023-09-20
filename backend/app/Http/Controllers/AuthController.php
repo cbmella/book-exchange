@@ -5,17 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    /**
+     * Register a new user and return an authentication token.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function register(Request $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        $validatedData = $this->validateRegistration($request);
 
         $user = User::create([
             'name' => $validatedData['name'],
@@ -25,15 +28,19 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json(['token' => $token], 201);
+        return response()->json(['token' => $token], Response::HTTP_CREATED);
     }
 
+    /**
+     * Authenticate a user and return an authentication token.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
     public function login(Request $request)
     {
-        $validatedData = $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+        $validatedData = $this->validateLogin($request);
 
         $user = User::where('email', $validatedData['email'])->first();
 
@@ -45,13 +52,48 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json(['token' => $token], 200);
+        return response()->json(['token' => $token], Response::HTTP_OK);
     }
 
+    /**
+     * Logout the authenticated user and invalidate their tokens.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
 
-        return response()->json(['message' => 'Logged out successfully'], 200);
+        return response()->json(['message' => 'Logged out successfully'], Response::HTTP_OK);
+    }
+
+    /**
+     * Validate the registration request data.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return array
+     */
+    private function validateRegistration(Request $request): array
+    {
+        return $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+    }
+
+    /**
+     * Validate the login request data.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return array
+     */
+    private function validateLogin(Request $request): array
+    {
+        return $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
     }
 }

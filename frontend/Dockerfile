@@ -1,3 +1,4 @@
+# Usar una imagen base de Node.js
 FROM node:16
 
 # Establecer el directorio de trabajo
@@ -10,5 +11,8 @@ RUN npm install
 # Copiar el resto de los archivos del proyecto
 COPY . .
 
-# Comando para iniciar la aplicación Vue
-CMD ["npm", "run", "serve"]
+# Construir la aplicación Next.js
+RUN npm run build
+
+# Comando para iniciar la aplicación Next.js
+CMD ["npm", "start"]
