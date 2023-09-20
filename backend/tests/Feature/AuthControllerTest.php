@@ -20,7 +20,7 @@ class AuthControllerTest extends TestCase
      */
     public function a_user_can_register()
     {
-        $password = $this->faker->password;
+        $password = $this->faker->password(8, 20);
         $userData = [
             'name' => $this->faker->name,
             'email' => $this->faker->email,
