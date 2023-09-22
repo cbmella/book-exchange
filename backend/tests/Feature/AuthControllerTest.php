@@ -7,17 +7,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Symfony\Component\HttpFoundation\Response;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthControllerTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
-    /**
-     * Test that a user can register successfully.
-     *
-     * @test
-     * @return void
-     */
     public function a_user_can_register()
     {
         $password = $this->faker->password(8, 20);
@@ -36,12 +31,6 @@ class AuthControllerTest extends TestCase
         $this->assertDatabaseHas('users', ['email' => $userData['email']]);
     }
 
-    /**
-     * Test that a user can login with valid credentials.
-     *
-     * @test
-     * @return void
-     */
     public function a_user_can_login_with_valid_credentials()
     {
         $user = User::factory()->create([
@@ -57,12 +46,6 @@ class AuthControllerTest extends TestCase
             ->assertJsonStructure(['token']);
     }
 
-    /**
-     * Test that a user cannot login with invalid credentials.
-     *
-     * @test
-     * @return void
-     */
     public function a_user_cannot_login_with_invalid_credentials()
     {
         $user = User::factory()->create();
@@ -73,5 +56,20 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    public function a_user_can_logout()
+    {
+        $user = User::factory()->create();
+        $token = JWTAuth::fromUser($user);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->postJson(route('logout'));
+
+        $response->assertStatus(Response::HTTP_OK);
+
+        // Verificar que el token ya no es válido
+        $this->assertFalse(JWTAuth::setToken($token)->check());
     }
 }

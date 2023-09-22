@@ -7,15 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    /**
-     * Register a new user and return an authentication token.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function register(Request $request)
     {
         $validatedData = $this->validateRegistration($request);
@@ -26,54 +21,31 @@ class AuthController extends Controller
             'password' => Hash::make($validatedData['password']),
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = JWTAuth::fromUser($user);
 
         return response()->json(['token' => $token], Response::HTTP_CREATED);
     }
 
-    /**
-     * Authenticate a user and return an authentication token.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function login(Request $request)
     {
         $validatedData = $this->validateLogin($request);
 
-        $user = User::where('email', $validatedData['email'])->first();
-
-        if (!$user || !Hash::check($validatedData['password'], $user->password)) {
+        if (!$token = JWTAuth::attempt($validatedData)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
         return response()->json(['token' => $token], Response::HTTP_OK);
     }
 
-    /**
-     * Logout the authenticated user and invalidate their tokens.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
+        JWTAuth::invalidate(JWTAuth::getToken());
 
         return response()->json(['message' => 'Logged out successfully'], Response::HTTP_OK);
     }
 
-    /**
-     * Validate the registration request data.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return array
-     */
     private function validateRegistration(Request $request): array
     {
         return $request->validate([
@@ -83,12 +55,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Validate the login request data.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return array
-     */
     private function validateLogin(Request $request): array
     {
         return $request->validate([
