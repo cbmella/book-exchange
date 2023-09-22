@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\ExchangeController;
@@ -8,7 +9,9 @@ use Illuminate\Support\Facades\Route;
 /**
  * Authentication routes
  */
+
 Route::post('login', [AuthController::class, 'login'])->name('login');
+
 Route::post('register', [AuthController::class, 'register'])->name('register');
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:api')->name('logout');
 

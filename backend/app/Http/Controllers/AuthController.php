@@ -11,9 +11,9 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register()
     {
-        $validatedData = $this->validateRegistration($request);
+        $validatedData = $this->validateRegistration(request());
 
         $user = User::create([
             'name' => $validatedData['name'],
@@ -25,15 +25,12 @@ class AuthController extends Controller
 
         return response()->json(['token' => $token], Response::HTTP_CREATED);
     }
-
     public function login(Request $request)
     {
         $validatedData = $this->validateLogin($request);
 
         if (!$token = JWTAuth::attempt($validatedData)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+            return response()->json(['error' => 'The provided credentials are incorrect.'], 401);
         }
 
         return response()->json(['token' => $token], Response::HTTP_OK);
