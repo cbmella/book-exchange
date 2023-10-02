@@ -13,6 +13,12 @@ class AuthControllerTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
+    /**
+     *  Test that a user can register.
+     *
+     * @test
+     * @return void
+     */
     public function a_user_can_register()
     {
         $password = $this->faker->password(8, 20);
@@ -31,6 +37,12 @@ class AuthControllerTest extends TestCase
         $this->assertDatabaseHas('users', ['email' => $userData['email']]);
     }
 
+    /**
+     * Test that a user can login with valid credentials.
+     *
+     * @test
+     * @return void
+     */
     public function a_user_can_login_with_valid_credentials()
     {
         $user = User::factory()->create([
@@ -46,6 +58,12 @@ class AuthControllerTest extends TestCase
             ->assertJsonStructure(['token']);
     }
 
+    /**
+     * Test that a user cannot login with invalid credentials.
+     *
+     * @test
+     * @return void
+     */
     public function a_user_cannot_login_with_invalid_credentials()
     {
         $user = User::factory()->create();
@@ -55,13 +73,37 @@ class AuthControllerTest extends TestCase
             'password' => 'wrong-password',
         ]);
 
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED)
+            ->assertJson(['error' => 'The provided credentials are incorrect.']);
     }
 
+    /**
+     * Test that a user cannot login with an invalid email format.
+     *
+     * @test
+     * @return void
+     */
+    public function a_user_cannot_login_with_invalid_email_format()
+    {
+        $response = $this->postJson(route('login'), [
+            'email' => 'invalidEmailFormat',
+            'password' => 'password',
+        ]);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJson(['message' => 'The email field must be a valid email address.']);
+    }
+
+    /**
+     * Test that a user can logout.
+     *
+     * @test
+     * @return void
+     */
     public function a_user_can_logout()
     {
         $user = User::factory()->create();
-        $token = JWTAuth::fromUser($user);
+        $token = JWTAuth::fromUser($user, ['key' => config('jwt.secret')]);
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
@@ -69,7 +111,6 @@ class AuthControllerTest extends TestCase
 
         $response->assertStatus(Response::HTTP_OK);
 
-        // Verificar que el token ya no es válido
         $this->assertFalse(JWTAuth::setToken($token)->check());
     }
 }
