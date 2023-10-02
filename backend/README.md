@@ -67,6 +67,10 @@ La plataforma permite:
 
 -   `POST /api/exchanges/{exchange}/review`: Dejar una opinión sobre un intercambio (requiere autenticación).
 
+### Swagger:
+
+-   `GET /api/documentation`: Documentación de la API.
+
 ## Testing
 
 Para garantizar la calidad y el correcto funcionamiento del backend, se han implementado pruebas unitarias y de características utilizando PHPUnit.
