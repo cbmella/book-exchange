@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
+
 
 class AuthController extends Controller
 {
@@ -17,7 +20,7 @@ class AuthController extends Controller
 
         $user = User::create([
             'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
+            'email' => strtolower($validatedData['email']), // Convert email to lowercase
             'password' => Hash::make($validatedData['password']),
         ]);
 
@@ -25,9 +28,11 @@ class AuthController extends Controller
 
         return response()->json(['token' => $token], Response::HTTP_CREATED);
     }
+
     public function login(Request $request)
     {
         $validatedData = $this->validateLogin($request);
+        $validatedData['email'] = strtolower($validatedData['email']); // Convert email to lowercase
 
         if (!$token = JWTAuth::attempt($validatedData)) {
             return response()->json(['error' => 'The provided credentials are incorrect.'], 401);
@@ -45,12 +50,35 @@ class AuthController extends Controller
 
     private function validateRegistration(Request $request): array
     {
-        return $request->validate([
+        $email = $request->input('email');
+
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                function ($attribute, $value, $fail) use ($email) {
+                    $existingUser = User::where('email', strtolower($email))->first();
+                    if ($existingUser) {
+                        $fail('The email has already been taken.');
+                    }
+                },
+            ],
             'password' => 'required|string|min:8|confirmed',
         ]);
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
+        $validatedData = $validator->validated();
+        $validatedData['email'] = strtolower($validatedData['email']); // Convert email to lowercase
+
+        return $validatedData;
     }
+
 
     private function validateLogin(Request $request): array
     {

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('email')->unique()->collation('utf8mb4_unicode_ci'); // Set collation for email column
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

@@ -105,4 +105,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Exchange::class, 'lender_id');
     }
+
+    /**
+     * Set the user's email.
+     *
+     * @param string $value
+     */
+    public function setEmailAttribute($value)
+    {
+        $this->attributes['email'] = strtolower($value);
+    }
 }
